@@ -1,7 +1,0 @@
-urllib3.connectionpool 2023-03-16 14:22:07,937-->Starting new HTTP connection (1): localhost:9000 228
-urllib3.connectionpool 2023-03-16 14:22:07,938-->http://localhost:9000 "GET /mybucket?location= HTTP/1.1" 200 128 456
-urllib3.connectionpool 2023-03-16 14:22:07,941-->http://localhost:9000 "GET /mybucket?delimiter=&encoding-type=url&list-type=2&max-keys=1000&prefix=4%2Fpages HTTP/1.1" 200 979 456
-urllib3.connectionpool 2023-03-16 14:22:07,945-->http://localhost:9000 "HEAD /mybucket/4/pages/page0/pages0.jpg HTTP/1.1" 200 0 456
-urllib3.connectionpool 2023-03-16 14:22:07,948-->http://localhost:9000 "GET /mybucket/4/pages/page0/pages0.jpg HTTP/1.1" 200 72280 456
-urllib3.connectionpool 2023-03-16 14:22:08,497-->http://localhost:9000 "HEAD /mybucket/4/pages/page1/pages1.jpg HTTP/1.1" 200 0 456
-urllib3.connectionpool 2023-03-16 14:22:08,500-->http://localhost:9000 "GET /mybucket/4/pages/page1/pages1.jpg HTTP/1.1" 200 31840 456
