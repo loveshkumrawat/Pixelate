@@ -6,7 +6,7 @@ from connection.postgres_database_connection import session
 from models import File
 import globals
 from connection.minio_client_connection import minioClient
-from logs.logs import logger
+from supporting_files.logs import logger
 
 
 def upload_file_to_minio(data, filename):

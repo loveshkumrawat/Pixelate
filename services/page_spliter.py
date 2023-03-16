@@ -7,7 +7,7 @@ from minio import S3Error
 import globals
 from connection.minio_client_connection import minioClient
 from connection.postgres_database_connection import session
-from logs.logs import logger
+from supporting_files.logs import logger
 
 def convert_to_image(file_id, file_name):
     try:

@@ -23,6 +23,7 @@ def extract_text(id):
                                 file_path=f'files/pages{fc}.jpg')
         img = cv2.imread(f'./files/pages{fc}.jpg')
         d = pytesseract.image_to_data(img, output_type=Output.DICT)
+
         n_boxes = len(d['level'])
 
         for i in range(n_boxes):
@@ -46,7 +47,7 @@ def extract_text(id):
         #print(my_dict)
 
 
-
+extract_text(4)
 
 
 
