@@ -12,3 +12,4 @@ collection = database['collection1']
 # for x in cursor:
 #     print(x)
 
+

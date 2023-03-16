@@ -37,3 +37,4 @@ def add_file_to_database(file_name):
         return file_id + 1
     except:
         logger.error('error in adding file data to database')
+

@@ -38,3 +38,4 @@ def get_file_from_minio(file_id, file_name):
 
     except S3Error as e:
         logger.error("Error: {}".format(e))
+

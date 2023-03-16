@@ -47,3 +47,4 @@ def extract_text(id):
 
 
 
+

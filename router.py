@@ -18,3 +18,4 @@ def text_extraction(page_id:int):
     json_text_extractor.extract_text(page_id)
 
 
+
