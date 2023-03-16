@@ -15,6 +15,6 @@ def split_page(file_id,file_name):
 
 @app.get("/textExtractor")
 def text_extraction(page_id:int):
-    text_extractor.extract_text(page_id)
+    json_text_extractor.extract_text(page_id)
 
 
