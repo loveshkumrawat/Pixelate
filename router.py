@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile
-import page_spliiter
-import text_extractor
-from service import *
+from Services import page_spliiter
+from Services import json_text_extractor
+from Services.router_service import *
 app = FastAPI()
 
 @app.post("/add_file")
