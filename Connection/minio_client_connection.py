@@ -5,3 +5,4 @@ minioClient = Minio(endpoint="localhost:9000",
                     secret_key="minioadmin",
                     secure=False)
 
+
