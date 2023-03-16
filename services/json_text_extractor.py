@@ -1,9 +1,9 @@
 import cv2
 import pytesseract
 from pytesseract import Output
-from Connection.minio_client_connection import minioClient
+from connection.minio_client_connection import minioClient
 import globals
-from Connection.mongo_db_connection import collection
+from connection.mongo_db_connection import collection
 
 
 def extract_text(id):
@@ -44,6 +44,7 @@ def extract_text(id):
         my_dict.update({'words': my_data})
         # collection.insert_one(my_dict)
         #print(my_dict)
+
 
 
 

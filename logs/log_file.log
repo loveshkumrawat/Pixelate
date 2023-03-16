@@ -6,3 +6,4 @@ urllib3.connectionpool 2023-03-16 12:44:58,340-->http://localhost:9000 "GET /myb
 urllib3.connectionpool 2023-03-16 12:44:59,166-->http://localhost:9000 "HEAD /mybucket/4/pages/page1/pages1.jpg HTTP/1.1" 200 0 456
 urllib3.connectionpool 2023-03-16 12:44:59,169-->http://localhost:9000 "GET /mybucket/4/pages/page1/pages1.jpg HTTP/1.1" 200 31840 456
 
+

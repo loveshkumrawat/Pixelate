@@ -4,3 +4,4 @@ logging.basicConfig(filename='log_file.log', filemode='w', format="%(name)s %(as
                     level=logging.DEBUG)
 logger = logging.getLogger()
 
+

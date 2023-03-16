@@ -5,8 +5,8 @@ from models import File
 import fitz
 from minio import S3Error
 import globals
-from Connection.minio_client_connection import minioClient
-from Connection.postgres_database_connection import session
+from connection.minio_client_connection import minioClient
+from connection.postgres_database_connection import session
 from logs.logs import logger
 
 def convert_to_image(file_id, file_name):
@@ -38,5 +38,6 @@ def get_file_from_minio(file_id, file_name):
 
     except S3Error as e:
         logger.error("Error: {}".format(e))
+
 
 

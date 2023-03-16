@@ -1,4 +1,4 @@
-from Connection.postgres_database_connection import  engine, base
+from connection.postgres_database_connection import  engine, base
 from sqlalchemy import Column, Integer, String, DateTime
 
 
