@@ -3,7 +3,7 @@ import pytesseract
 from pytesseract import Output
 from connection.minio_client_connection import minioClient
 import globals
-from connection.mongo_db_connection import collection
+from connection.mongo_db_connection import database
 
 
 def extract_text(id):
@@ -43,11 +43,10 @@ def extract_text(id):
             my_file.update({'paraNum': para_num})
             my_data.append(my_file)
         my_dict.update({'words': my_data})
-        # collection.insert_one(my_dict)
+        collection=database[f'{id}']
+        collection.insert_one(my_dict)
         #print(my_dict)
 
-
-extract_text(4)
 
 
 

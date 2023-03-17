@@ -1,4 +1,4 @@
-import os
+import io
 from datetime import datetime
 from minio import S3Error
 from sqlalchemy import func
@@ -10,19 +10,17 @@ from supporting_files.logs import logger
 
 
 def upload_file_to_minio(data, filename):
-    with open(f"{os.getcwd()}/files/{filename}", "wb") as f:
-        f.write(data)
     found = minioClient.bucket_exists(globals.bucket_name)
     if not found:
         minioClient.make_bucket(globals.bucket_name)
     try:
         file_id = add_file_to_database(filename)
-        minioClient.fput_object(globals.bucket_name, f"{file_id}/files/{filename}", file_path=f"./files/{filename}")
+        minioClient.put_object(bucket_name=globals.bucket_name, object_name=f"{file_id}/files/{filename}",
+                               data=io.BytesIO(data), length=len(data), content_type="pdf")
         logger.info(f"Successfully uploaded to {globals.bucket_name}")
 
     except S3Error as e:
         logger.error("Error: {}".format(e))
-
 
 def add_file_to_database(file_name):
     try:
@@ -37,5 +35,6 @@ def add_file_to_database(file_name):
         return file_id + 1
     except:
         logger.error('error in adding file data to database')
+
 
 

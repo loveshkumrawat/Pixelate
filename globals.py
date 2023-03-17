@@ -1,5 +1,2 @@
 bucket_name='mybucket'
 
-
-
-

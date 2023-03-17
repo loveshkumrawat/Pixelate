@@ -6,11 +6,9 @@ except:
     print('connection not successful')
 
 database = client['text_extractor']
-collection = database['collection1']
+# database.collection1.drop()
 
-# cursor=collection.find()
-# for x in cursor:
-#     print(x)
+
 
 
 
