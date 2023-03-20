@@ -9,7 +9,7 @@ class TextExtractor(base):
     fetch_time = Column(DateTime, nullable=True)
     status = Column(String(64), nullable=True)
     error = Column(String(128), nullable=True)
-    submission_time = Column(String(DateTime), nullable=True)
+    submission_time = Column(DateTime, nullable=True)
 
 
 base.metadata.create_all(engine)
