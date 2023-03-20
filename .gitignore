@@ -11,3 +11,12 @@
 **/frontend/
 **/templates/
 **/venv/
+/.logstore
+**/PF-Minio-Vol/
+**/PF-Mongo-Vol/
+**/.logstore
+**/.vscode/
+**/File-Upload-Vol/
+**/Metadata-Extractor-Vol/
+**/Page-Splitter-Vol/
+**/Text-Extractor-Vol/
