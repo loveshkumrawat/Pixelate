@@ -12,4 +12,4 @@ class TextExtractor(base):
     submission_time = Column(String(DateTime), nullable=True)
 
 
-base.metdata.create_all(engine)
+base.metadata.create_all(engine)

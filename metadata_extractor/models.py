@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime
-from db_connection_for__metadata_extractor import base, engine
+from metadata_extractor.db_connection import base, engine
 
 
 class MetaDataExtractor(base):

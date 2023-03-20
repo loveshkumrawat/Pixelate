@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime
-from db_connection_for_page_splitter import base, engine
+from page_splitter.db_connection import base, engine
 
 
 class PageSplitter(base):

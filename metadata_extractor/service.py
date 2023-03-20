@@ -7,7 +7,7 @@ import globals
 from fastapi import HTTPException, status
 from connection.mongo_db_connection import database
 from models import MetaDataExtractor
-from db_connection_for__metadata_extractor import session
+from metadata_extractor.db_connection import session
 
 global pre_word_block, pre_word_para
 

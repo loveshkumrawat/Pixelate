@@ -7,9 +7,3 @@ except:
 
 database = client['text_extractor']
 # database.collection1.drop()
-
-
-
-
-
-

@@ -2,7 +2,7 @@ import io
 from datetime import datetime
 from minio import S3Error
 from sqlalchemy import func
-from file_upload.db_connection_for_file_upload import session
+from file_upload.db_connection import session
 from models import File
 import globals
 from connection.minio_client_connection import minioClient
@@ -38,6 +38,3 @@ def add_file_to_database(file_name):
         return file_id + 1
     except:
         logger.error('error in adding file data to database')
-
-
-

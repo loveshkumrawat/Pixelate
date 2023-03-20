@@ -5,9 +5,9 @@ import fitz
 from minio import S3Error
 import globals
 from connection.minio_client_connection import minioClient
-from file_upload.db_connection_for_file_upload import session
+from file_upload.db_connection import session
 from supporting_files.logs import logger
-from db_connection_for_page_splitter import session
+from page_splitter.db_connection import session
 from models import PageSplitter
 
 

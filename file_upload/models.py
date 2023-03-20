@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime
-from db_connection_for_file_upload import base,engine
+from db_connection import base,engine
 
 class File(base):
     __tablename__ = "files"
