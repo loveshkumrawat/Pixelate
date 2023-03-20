@@ -23,13 +23,13 @@ def extract_text(file_id, file_name):
         prefix=path,
         recursive=True
     )
-    file_count = sum(1 for _ in objects)
-    for fc in range(0, file_count):
+    page_count = sum(1 for _ in objects)
+    for pc in range(0, page_count):
         try:
-            minioClient.fget_object(bucket_name=globals.bucket_name, object_name=f"{path}/page{fc}/pages{fc}.jpg",
-                                    file_path=f'./files/pages{fc}.jpg')
+            minioClient.fget_object(bucket_name=globals.bucket_name, object_name=f"{path}/page{pc}/pages{pc}.jpg",
+                                    file_path=f'./files/pages{pc}.jpg')
 
-            img = cv2.imread(f'./files/pages{fc}.jpg')
+            img = cv2.imread(f'./files/pages{pc}.jpg')
             d = pytesseract.image_to_data(img, output_type=Output.DICT)
             n_boxes = len(d['level'])
             ans_dict = {}
@@ -39,7 +39,7 @@ def extract_text(file_id, file_name):
             para_list = []
 
             word_list = []
-            ans_dict.update({'page_no': fc})
+            ans_dict.update({'page_no': pc})
             ans_dict.update({'blocks': block_list})
             set_global_var(d, n_boxes)
             global pre_word_block, pre_word_para
@@ -87,7 +87,7 @@ def extract_text(file_id, file_name):
             data.error = f'{e}'
             session.commit()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                                detail='error in text_extraccting')
+                                detail='error in text_extracting')
 
 
 def set_global_var(d, n_boxes):
