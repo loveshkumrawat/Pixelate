@@ -1,0 +1,99 @@
+version: '3'
+
+services:
+
+  PF-db-file-upload:
+    container_name: PF-postgres-file-upload
+    image: postgres:latest
+    volumes:
+      - ./File-Upload-Vol:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: file_upload
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5001:5432
+
+  PF-db-metadata-extractor:
+    container_name: PF-postgres-metadata-extractor
+    image: postgres:latest
+    volumes:
+      - ./Metadata-Extractor-Vol:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: metadata_extractor
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5002:5432
+
+  PF-db-page-splitter:
+    container_name: PF-postgres-page-splitter
+    image: postgres:latest
+    volumes:
+      - ./Page-Splitter-Vol:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: page_splitter
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5003:5432
+
+  PF-db-text-extractor:
+    container_name: PF-postgres-text-extractor
+    image: postgres:latest
+    volumes:
+      - ./Text-Extractor-Vol:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: text_extractor
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5004:5432
+  
+  PF-minio:
+    container_name: PF-minio
+    image: minio/minio:latest
+    volumes:
+      - ./PF-Minio-Vol:/data
+    environment:
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+    ports:
+      - 9000:9000
+      - 9001:9001
+    command: server /data
+  
+  PF-mongodb:
+    container_name: PF-mongo
+    image: mongo:latest
+    volumes:
+      - ./PF-Mongo-Vol:/data/db
+    ports:
+      - 5000:27017
+
+  # PF-api:
+  #   container_name: PF-api
+  #   image: ...
+  #   environment:
+  #     DB_File_Upload_HOST: PF-db-file-upload
+  #     DB_Metadata_Extractor_HOST: PF-db-metadata-extractor
+  #     DB_Page_Splitter_HOST: PF-db-page-splitter
+  #     DB_Text_Extractor_HOST: PF-db-text-extractor
+  #     DB_File_Upload_PORT: 5001
+  #     DB_Metadata_Extractor_PORT: 5002
+  #     DB_Page_Splitter_PORT: 5003
+  #     DB_Text_Extractor_PORT: 5004
+  #     DB_File_Upload_NAME: file_upload
+  #     DB_Metadata_Extractor_NAME: metadata_extractor
+  #     DB_Page_Splitter_NAME: page_splitter
+  #     DB_Text_Extractor_NAME: text_extractor
+  #     DB_USER: postgres
+  #     DB_PASSWORD: postgres
+  #     LOG_LEVEL: DEBUG
+  #   depends_on:
+  #     - PF-db-file-upload
+  #     - PF-db-metadata-extractor
+  #     - PF-db-page-splitter
+  #     - PF-db-text-extractor
+  #   ports:
+  #     - 3000:80
