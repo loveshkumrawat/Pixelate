@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 
 try:
     engine = create_engine(
-        "postgresql://postgres:Welcome4$@localhost:5012/page_extractor",
+        "postgresql://postgres:Welcome4$@localhost:5012/text_extractor",
         echo=False
     )
     session = sessionmaker(bind=engine)()

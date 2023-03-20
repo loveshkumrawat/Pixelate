@@ -5,7 +5,7 @@ from connection.minio_client_connection import minioClient
 import globals
 from connection.mongo_db_connection import database
 
-
+metadata_extractor
 def extract_text(id):
     path = f'{id}/pages'
     objects = minioClient.list_objects(

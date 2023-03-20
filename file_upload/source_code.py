@@ -2,7 +2,7 @@ import io
 from datetime import datetime
 from minio import S3Error
 from sqlalchemy import func
-from connection.postgres_database_connection import session
+from file_upload.db_connection_for_file_upload import session
 from models import File
 import globals
 from connection.minio_client_connection import minioClient
@@ -21,6 +21,7 @@ def upload_file_to_minio(data, filename):
 
     except S3Error as e:
         logger.error("Error: {}".format(e))
+
 
 def add_file_to_database(file_name):
     try:
