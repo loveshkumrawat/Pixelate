@@ -7,6 +7,7 @@ from models import File
 import globals
 from connection.minio_client_connection import minioClient
 from supporting_files.logs import logger
+from fastapi import HTTPException,status
 
 
 def upload_file_to_minio(data, filename):
@@ -18,8 +19,9 @@ def upload_file_to_minio(data, filename):
         minioClient.put_object(bucket_name=globals.bucket_name, object_name=f"{file_id}/files/{filename}",
                                data=io.BytesIO(data), length=len(data), content_type="pdf")
         logger.info(f"Successfully uploaded to {globals.bucket_name}")
-
+        return file_id
     except S3Error as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail='error in uplaoding file to minio')
         logger.error("Error: {}".format(e))
 
 
