@@ -1,0 +1,13 @@
+**/.idea
+**/__pycache__
+**/files
+**/README.md
+**/temp
+**/log_file.log
+**/logs.py
+**/temp
+**/log_file.log
+**/services
+**/frontend/
+**/templates/
+**/venv/

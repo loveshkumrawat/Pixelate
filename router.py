@@ -10,7 +10,6 @@ app = FastAPI()
 
 @app.post("/extractor")
 def add_file(file: UploadFile):
-
     try:
         # upload file
         data = file.file.read()

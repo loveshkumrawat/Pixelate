@@ -9,4 +9,5 @@ try:
     session = sessionmaker(bind=engine)()
     base = declarative_base()
 
-except Exception as e: print(e)
+except Exception as e:
+    print(e)
