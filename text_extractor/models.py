@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime
-from db_connection_for_text_extractor import base, engine
+from text_extractor.db_connection import base, engine
 
 
 class TextExtractor(base):

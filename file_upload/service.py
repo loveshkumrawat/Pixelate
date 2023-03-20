@@ -3,7 +3,7 @@ from datetime import datetime
 from minio import S3Error
 from sqlalchemy import func
 from file_upload.db_connection import session
-from models import File
+from file_upload.models import File
 import globals
 from connection.minio_client_connection import minioClient
 from supporting_files.logs import logger

@@ -1,9 +1,9 @@
 import uvicorn as uvicorn
 from fastapi import FastAPI, UploadFile
-from file_upload.source_code import upload_file_to_minio
-from page_splitter.source_code import convert_to_image
-from text_extractor.source_code import text_extract_from_file
-from metadata_extractor.source_code import extract_text
+from file_upload.service import upload_file_to_minio
+from page_splitter.service import convert_to_image
+from text_extractor.service import text_extract_from_file
+from metadata_extractor.service import extract_text
 
 app = FastAPI()
 
@@ -23,7 +23,7 @@ def add_file(file: UploadFile):
         text_extract_from_file(file_id, file.filename)
 
         # metadata extractor
-        extract_text(file_id)
+        extract_text(file_id, file.filename)
 
         # return Successful message
         return {"message": "Extraction Done",

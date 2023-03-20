@@ -3,14 +3,10 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 
 try:
     engine = create_engine(
-        "postgresql://postgres:Welcome4$@localhost:5012/text_extractor",
+        "postgresql://postgres:postgres@localhost:5004/text_extractor",
         echo=False
     )
     session = sessionmaker(bind=engine)()
     base = declarative_base()
 
-except Exception as e:
-    print(e)
-
-
-
+except Exception as e: print(e)

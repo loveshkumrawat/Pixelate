@@ -8,14 +8,14 @@ from connection.minio_client_connection import minioClient
 from file_upload.db_connection import session
 from supporting_files.logs import logger
 from page_splitter.db_connection import session
-from models import PageSplitter
+from page_splitter.models import PageSplitter
 
 
 def convert_to_image(file_id, file_name):
     fileObject = session.query(PageSplitter).filter(id == file_id)
     try:
         get_file_from_minio(file_id, file_name)
-        doc = fitz.open(f'./files/{file_name}')
+        doc = fitz.open(f'files/{file_name}')
         for page in doc:
             pix = page.get_pixmap(matrix=fitz.Identity, dpi=None, colorspace=fitz.csRGB, clip=None, alpha=True,
                                   annots=True)
@@ -38,7 +38,7 @@ def convert_to_image(file_id, file_name):
 
 def get_file_from_minio(file_id, file_name):
     try:
-        minioClient.fget_object(globals.bucket_name, f"{file_id}/files/{file_name}", f"./files/{file_name}")
+        minioClient.fget_object(globals.bucket_name, f"{file_id}/files/{file_name}", f"files/{file_name}")
         logger.info(f"Successfully downloaded  from {globals.bucket_name}'.")
         file = PageSplitter(id=file_id, file_name=file_name, fetch_time=datetime.now())
         session.add(file)

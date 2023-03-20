@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 
 try:
     engine = create_engine(
-        "postgresql://postgres:Welcome4$@localhost:5012/image_upload",
+        "postgresql://postgres:postgres@localhost:5001/file_upload",
         echo=False
     )
     session = sessionmaker(bind=engine)()

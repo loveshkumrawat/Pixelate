@@ -6,7 +6,7 @@ from connection.minio_client_connection import minioClient
 import globals
 from fastapi import HTTPException, status
 from connection.mongo_db_connection import database
-from models import MetaDataExtractor
+from metadata_extractor.models import MetaDataExtractor
 from metadata_extractor.db_connection import session
 
 global pre_word_block, pre_word_para
@@ -27,9 +27,9 @@ def extract_text(file_id, file_name):
     for pc in range(0, page_count):
         try:
             minioClient.fget_object(bucket_name=globals.bucket_name, object_name=f"{path}/page{pc}/pages{pc}.jpg",
-                                    file_path=f'./files/pages{pc}.jpg')
+                                    file_path=f'files/pages{pc}.jpg')
 
-            img = cv2.imread(f'./files/pages{pc}.jpg')
+            img = cv2.imread(f'files/pages{pc}.jpg')
             d = pytesseract.image_to_data(img, output_type=Output.DICT)
             n_boxes = len(d['level'])
             ans_dict = {}
