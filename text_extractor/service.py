@@ -1,4 +1,6 @@
 import io
+import os
+
 import cv2
 import pytesseract
 from minio import S3Error
@@ -27,11 +29,11 @@ def get_img_from_file(current_file_name: str, current_file_id: int, page_no: str
         img = minioClient.get_object(bucket_name=globals.bucket_name,
                                      object_name=f"{current_file_id}/pages/page{page_no}/pages{page_no}.jpg")
         contents = img.read()
-        with open(f"/home/billion/text-extraction/files/{current_file_name}_page_{page_no}", "wb") as f:
+        with open(f"{os.getcwd()}/files/{current_file_name}_page_{page_no}.jpg", "wb") as f:
             f.write(contents)
     except S3Error as e:
         print(e)
-    return cv2.imread(f"/home/billion/text-extraction/files/{current_file_name}_page_{page_no}")
+    return cv2.imread(f"{os.getcwd()}/files/{current_file_name}_page_{page_no}.jpg")
 
 
 def no_of_objects_in_file(current_file_id: int):

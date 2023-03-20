@@ -1,3 +1,5 @@
+import os
+
 import cv2
 import pytesseract
 from datetime import datetime
@@ -5,31 +7,32 @@ from pytesseract import Output
 from connection.minio_client_connection import minioClient
 import globals
 from fastapi import HTTPException, status
-from connection.mongo_db_connection import database
-from models import MetaDataExtractor
-from db_connection_for__metadata_extractor import session
+from metadata_extractor.mongo_db_connection import database
+from metadata_extractor.models import MetaDataExtractor
+from metadata_extractor.db_connection import session
 
 global pre_word_block, pre_word_para
 
 
-def extract_text(file_id, file_name):
+def extract_text(file_id: int, file_name: str):
     file = MetaDataExtractor(id=file_id, file_name=file_name, fetch_time=datetime.now())
     session.add(file)
     session.commit()
-    data = session.query(MetaDataExtractor).filter(id == file_id)
-    path = f'{id}/pages'
+    data = session.query(MetaDataExtractor).filter(MetaDataExtractor.id == file_id).first()
+    path = f'{file_id}/pages'
     objects = minioClient.list_objects(
         bucket_name=globals.bucket_name,
         prefix=path,
         recursive=True
     )
-    page_count = sum(1 for _ in objects)
+    page_count=int(sum(1 for _ in objects) / 2)
+    print(page_count)
     for pc in range(0, page_count):
         try:
             minioClient.fget_object(bucket_name=globals.bucket_name, object_name=f"{path}/page{pc}/pages{pc}.jpg",
-                                    file_path=f'./files/pages{pc}.jpg')
+                                    file_path=f'{os.getcwd()}/files/pages{pc}.jpg')
 
-            img = cv2.imread(f'./files/pages{pc}.jpg')
+            img = cv2.imread(f'{os.getcwd()}/files/pages{pc}.jpg')
             d = pytesseract.image_to_data(img, output_type=Output.DICT)
             n_boxes = len(d['level'])
             ans_dict = {}
@@ -77,8 +80,10 @@ def extract_text(file_id, file_name):
 
             collection = database[f'{file_id}']
             collection.insert_one(ans_dict)
+
             data.status = 'successful'
             data.submission_time = datetime.now()
+            data.error = 'NULL'
             session.commit()
 
         except Exception as e:

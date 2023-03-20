@@ -2,20 +2,20 @@ import io
 from datetime import datetime
 from minio import S3Error
 from sqlalchemy import func
-from file_upload.db_connection_for_file_upload import session
-from models import File
+from file_upload.db_connection import session
+from file_upload.models import File
 import globals
 from connection.minio_client_connection import minioClient
 from supporting_files.logs import logger
 from fastapi import HTTPException,status
 
 
-def upload_file_to_minio(data, filename):
+def upload_file_to_minio(data, filename:str):
     found = minioClient.bucket_exists(globals.bucket_name)
     if not found:
         minioClient.make_bucket(globals.bucket_name)
     try:
-        file_id = add_file_to_database(filename)
+        file_id:int = add_file_to_database(filename)
         minioClient.put_object(bucket_name=globals.bucket_name, object_name=f"{file_id}/files/{filename}",
                                data=io.BytesIO(data), length=len(data), content_type="pdf")
         logger.info(f"Successfully uploaded to {globals.bucket_name}")
@@ -25,7 +25,7 @@ def upload_file_to_minio(data, filename):
         logger.error("Error: {}".format(e))
 
 
-def add_file_to_database(file_name):
+def add_file_to_database(file_name:str):
     try:
         file_id = session.query(func.max(File.id)).scalar()
         if not file_id:
