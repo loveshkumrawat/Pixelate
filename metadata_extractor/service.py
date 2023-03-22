@@ -1,5 +1,6 @@
 import os
 import cv2
+import numpy as np
 import pytesseract
 from datetime import datetime
 from pytesseract import Output
@@ -28,9 +29,12 @@ def extract_text(file_id: int, file_name: str):
     print(page_count)
     for pc in range(0, page_count):
         try:
-            minioClient.fget_object(bucket_name=globals.bucket_name, object_name=f"{path}/page{pc}/pages{pc}.jpg",
-                                    file_path=f'{os.getcwd()}/files/pages{pc}.jpg')
-            img = cv2.imread(f'{os.getcwd()}/files/pages{pc}.jpg')
+            response = minioClient.get_object(
+                bucket_name=globals.bucket_name,
+                object_name=f"{path}/page{pc}/pages{pc}.jpg"
+            )
+            
+            img = cv2.imdecode(np.frombuffer(response.data, np.uint8), cv2.IMREAD_COLOR)
 
             d = pytesseract.image_to_data(img, output_type=Output.DICT)
             n_boxes = len(d['level'])

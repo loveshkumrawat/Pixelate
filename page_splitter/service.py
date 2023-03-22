@@ -13,9 +13,10 @@ from page_splitter.models import PageSplitter
 
 def convert_to_image(file_id: int, file_name: str):
     try:
-        get_file_from_minio(file_id, file_name)
+        response = get_file_from_minio(file_id, file_name)
         fileObject = session.query(PageSplitter).filter(PageSplitter.id == file_id).first()
-        doc = fitz.open(f'{os.getcwd()}/files/{file_name}')
+        
+        doc = fitz.open(stream=response.data, filetype="pdf")
         for page in doc:
             pix = page.get_pixmap(matrix=fitz.Identity, dpi=None, colorspace=fitz.csRGB, clip=None, alpha=True,
                                   annots=True)
@@ -39,11 +40,18 @@ def convert_to_image(file_id: int, file_name: str):
 
 def get_file_from_minio(file_id: int, file_name: str):
     try:
-        minioClient.fget_object(globals.bucket_name, f"{file_id}/files/{file_name}", f"{os.getcwd()}/files/{file_name}")
+
+        response = minioClient.get_object(
+            bucket_name = globals.bucket_name,
+            object_name = f"{file_id}/files/{file_name}"
+        )
+
         logger.info(f"Successfully downloaded  from {globals.bucket_name}'.")
         file = PageSplitter(id=file_id, file_name=file_name, fetch_time=datetime.now())
         session.add(file)
         session.commit()
+
+        return response
 
     except S3Error as e:
         logger.error("Error: {}".format(e))
