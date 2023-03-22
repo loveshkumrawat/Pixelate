@@ -6,4 +6,4 @@ except:
     print('connection not successful')
 
 database = client['text_extractor']
-# database.collection1.drop()
+
