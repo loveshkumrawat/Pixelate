@@ -1,7 +1,6 @@
 import io
 import pytesseract
 from datetime import datetime
-
 from PIL import Image
 from pytesseract import Output
 from connection.minio_client_connection import minioClient
@@ -32,11 +31,8 @@ def extract_text(file_id: int, file_name: str):
             d = pytesseract.image_to_data(img, output_type=Output.DICT)
             n_boxes = len(d['level'])
             ans_dict = {}
-
             block_list = []
-
             para_list = []
-
             word_list = []
             ans_dict.update({'page_no': pc})
             ans_dict.update({'blocks': block_list})
@@ -144,3 +140,12 @@ def get_no_of_pages(file_id):
         recursive=True
     )
     return objects
+
+
+
+
+#             img = Image.open(io.BytesIO(response.data))
+#             white_bg = Image.new(mode = 'RGB', size = img.size, color = (255, 255, 255))
+#             alpha_channel = img.split()[3] if img.mode == "RGBA" else Image.new("L", img.size, 255)
+#             white_bg.paste(img, mask=alpha_channel)
+#             d = pytesseract.image_to_data(white_bg, output_type=Output.DICT)
