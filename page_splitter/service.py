@@ -1,5 +1,4 @@
 import io
-import os
 from datetime import datetime
 from fastapi import HTTPException, status
 import fitz

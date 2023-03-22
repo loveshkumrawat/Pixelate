@@ -4,6 +4,7 @@ from file_upload.service import upload_file_to_minio
 from page_splitter.service import convert_to_image
 from text_extractor.service import text_extract_from_file
 from metadata_extractor.service import extract_text
+from metadata_extractor.mongo_db_connection import database
 
 app = FastAPI()
 
@@ -30,6 +31,14 @@ def add_file(file: UploadFile):
     except Exception as e:
         print(e)
         return {"message": "Some exception have arise, Try again."}
+
+
+@app.get("/getData")
+def get_meta_data(id: int):
+    collection = database[f'{id}']
+    cursor = collection.find()
+    for x in cursor:
+        print(x)
 
 
 if __name__ == '__main__':
