@@ -21,8 +21,9 @@ def upload_file_to_minio(data, filename:str):
         logger.info(f"Successfully uploaded to {globals.bucket_name}")
         return file_id
     except S3Error as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail='error in uplaoding file to minio')
         logger.error("Error: {}".format(e))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail='error in uplaoding file to minio')
+
 
 
 def add_file_to_database(file_name:str):

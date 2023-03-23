@@ -4,7 +4,6 @@ import pytesseract
 from io import BytesIO
 from PIL import Image
 from minio import S3Error
-
 from connection.minio_client_connection import minioClient
 from text_extractor.db_connection import session
 from text_extractor.models import TextExtractor
@@ -60,7 +59,7 @@ def text_extract_from_file(file_id: int, file_name: str):
             print(f"Page{i}-----Text Extraction Done ")
         session.query(TextExtractor).filter(TextExtractor.id == file_id).update(
             {TextExtractor.status: "Successful",
-             TextExtractor.submission_time: datetime.datetime.now()}
+             TextExtractor.submission_time: datetime.datetime.now(), TextExtractor.error: 'NULL'}
         )
         session.commit()
     except Exception as e:

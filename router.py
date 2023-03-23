@@ -33,12 +33,11 @@ def add_file(file: UploadFile):
         # return Successful message
         return {"message": "Extraction Done",
                 "file_id": file_id}
-    # except HTTPException as e:
-    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e)
 
     except Exception as e:
         print(e)
-        return {'message': e}
+        return {"message": e}
+
 
 
 @app.get("/getData")

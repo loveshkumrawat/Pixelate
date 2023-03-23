@@ -16,7 +16,6 @@ def convert_to_image(file_id: int, file_name: str):
         response = get_file_from_minio(file_id, file_name)
         data_entry = session.query(PageSplitter).filter(PageSplitter.id == file_id).first()
         doc = fitz.open(stream=response.data, filetype="pdf")
-
         for page in doc:
             pix = page.get_pixmap(matrix=fitz.Identity, dpi=None, colorspace=fitz.csRGB, clip=None, alpha=True,
                                   annots=True)
@@ -30,21 +29,25 @@ def convert_to_image(file_id: int, file_name: str):
         data_entry.status = 'successful'
         data_entry.error = 'NULL'
         session.commit()
+
     except Exception as e:
         print("Inside splitter")
         print(e)
         logger.error('error in converting to image')
-        data_entry.status = 'not successful'
-        data_entry.error = f'{e}'
+        # data_entry.status = 'not successful'
+        # data_entry.error = f'{e}'
+        session.query(PageSplitter).filter(PageSplitter.id == file_id).update(
+            {PageSplitter.error: e, PageSplitter.status: 'unsuccessful'})
         session.commit()
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail='error in converting to image')
 
 
 def get_file_from_minio(file_id: int, file_name: str):
     try:
 
         response = minioClient.get_object(
-            bucket_name = globals.bucket_name,
-            object_name = f"{file_id}/files/{file_name}"
+            bucket_name=globals.bucket_name,
+            object_name=f"{file_id}/files/{file_name}"
         )
 
         logger.info(f"Successfully downloaded  from {globals.bucket_name}'.")
