@@ -1,9 +1,10 @@
+from supporting import env
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 try:
     engine = create_engine(
-        "postgresql://postgres:postgres@localhost:5432/metadata_extractor",
+        f"postgresql://{env.DB_USER}:{env.DB_PASSWORD}@{env.DB_HOST}:{env.DB_PORT}/metadata_extractor",
         echo=False
     )
     session = sessionmaker(bind=engine)()

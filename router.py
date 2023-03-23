@@ -1,3 +1,7 @@
+# Require to wait for the services to start
+from time import sleep
+sleep(5)
+
 import uvicorn as uvicorn
 from fastapi import FastAPI, UploadFile, HTTPException, status
 from file_upload.service import upload_file_to_minio
@@ -48,5 +52,4 @@ def get_meta_data(id: int):
         print(x)
 
 
-if __name__ == '__main__':
-    uvicorn.run("router:app", port=8001, reload=True)
+if __name__ == '__main__': uvicorn.run("router:app", port=3000, reload=True)
