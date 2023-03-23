@@ -150,14 +150,24 @@ def check_block_change(i, d, word_list, para_list, block_list, line_list):
 
 
 def check_para_change(i, d, para_list, word_list, line_list):
-    global pre_word_block, pre_word_para
+    global pre_word_block, pre_word_para ,pre_word_line
     para_dict = {}
+    line_dict = {}
+
+    line_dict.update({'line_no': pre_word_line})
+    temp_word_list = list(word_list)
+    line_dict.update({'words': temp_word_list})
+    line_list.append(line_dict)
+    word_list.clear()
+
     para_dict.update({"para_no": pre_word_para})
     temp_line_list = list(line_list)
     para_dict.update({"lines": temp_line_list})
-    word_list.clear()
     para_list.append(para_dict)
+    line_list.clear()
+
     if i != len(d['level']):
+        pre_word_line= d['par_num'][i]
         pre_word_para = d['par_num'][i]
 
 
@@ -169,13 +179,6 @@ def get_no_of_pages(file_id):
         recursive=True
     )
     return objects
-
-
-
-
-
-
-
 
 #             img = Image.open(io.BytesIO(response.data))
 #             white_bg = Image.new(mode = 'RGB', size = img.size, color = (255, 255, 255))

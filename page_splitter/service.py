@@ -34,8 +34,6 @@ def convert_to_image(file_id: int, file_name: str):
         print("Inside splitter")
         print(e)
         logger.error('error in converting to image')
-        # data_entry.status = 'not successful'
-        # data_entry.error = f'{e}'
         session.query(PageSplitter).filter(PageSplitter.id == file_id).update(
             {PageSplitter.error: e, PageSplitter.status: 'unsuccessful'})
         session.commit()

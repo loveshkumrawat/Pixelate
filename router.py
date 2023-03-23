@@ -1,3 +1,4 @@
+import pymongo
 import uvicorn as uvicorn
 from fastapi import FastAPI, UploadFile, HTTPException, status
 from file_upload.service import upload_file_to_minio
@@ -39,13 +40,21 @@ def add_file(file: UploadFile):
         return {"message": e}
 
 
-
 @app.get("/getData")
-def get_meta_data(id: int):
-    collection = database[f'{id}']
-    cursor = collection.find()
-    for x in cursor:
-        print(x)
+def get_meta_data(file_id: int, page_no: int):
+    try:
+        database.validate_collection(f'{file_id}')
+    except pymongo.errors.OperationFailure:
+        return {'message': 'collection does not exist'}
+
+    collection = database[f'{file_id}']
+    filter_criteria = {"page_no": page_no}
+    data = collection.find_one({'page_no': page_no},{'_id':0})
+    print(data)
+    return  data
+
+    # for x in data:
+    #     return x
 
 
 if __name__ == '__main__':
