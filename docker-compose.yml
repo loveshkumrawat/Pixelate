@@ -2,74 +2,39 @@ version: '3'
 
 services:
 
-  PF-db-file-upload:
-    container_name: PF-postgres-file-upload
+  PF-postgres:
+    container_name: PF-postgres
     image: postgres:latest
     volumes:
-      - ./File-Upload-Vol:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: file_upload
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      - ./Vol-PF-postgres:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - 5001:5432
+      - '5432:5432'
+    environment:
+      postgres_user: postgres
+      postgres_password: postgres
 
-  PF-db-metadata-extractor:
-    container_name: PF-postgres-metadata-extractor
-    image: postgres:latest
-    volumes:
-      - ./Metadata-Extractor-Vol:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: metadata_extractor
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - 5002:5432
 
-  PF-db-page-splitter:
-    container_name: PF-postgres-page-splitter
-    image: postgres:latest
-    volumes:
-      - ./Page-Splitter-Vol:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: page_splitter
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - 5003:5432
-
-  PF-db-text-extractor:
-    container_name: PF-postgres-text-extractor
-    image: postgres:latest
-    volumes:
-      - ./Text-Extractor-Vol:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: text_extractor
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - 5004:5432
-  
   PF-minio:
     container_name: PF-minio
     image: minio/minio:latest
     volumes:
-      - ./PF-Minio-Vol:/data
+      - ./Vol-PF-Minio:/data
     environment:
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_SECRET_KEY: minioadmin
+      MINIO_ACCESS_KEY: "minioadmin"
+      MINIO_SECRET_KEY: 'minioadmin'
     ports:
-      - 9000:9000
-      - 9001:9001
+      - '9000:9000'
+      - '9001:9001'
     command: server /data --console-address ":9001"
   
   PF-mongodb:
     container_name: PF-mongo
     image: mongo:latest
     volumes:
-      - ./PF-Mongo-Vol:/data/db
+      - ./Vol-PF-Mongo:/data/db
     ports:
-      - 5000:27017
+      - '5000:27017'
 
   # PF-api:
   #   container_name: PF-api

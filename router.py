@@ -12,12 +12,13 @@ app = FastAPI()
 @app.post("/extractor")
 def add_file(file: UploadFile):
     try:
-        # upload file
 
+        # check if file is empty or not
         data = file.file.read()
         if not data:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='empty file')
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Uploaded File is Empty")
 
+        # upload file
         file_id: int = upload_file_to_minio(data, file.filename)
 
         # page splitter
@@ -32,9 +33,11 @@ def add_file(file: UploadFile):
         # return Successful message
         return {"message": "Extraction Done",
                 "file_id": file_id}
+
     except Exception as e:
         print(e)
         return {"message": e}
+
 
 
 @app.get("/getData")
