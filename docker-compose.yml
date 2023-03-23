@@ -9,7 +9,7 @@ services:
       - ./Vol-PF-postgres:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - '5432:5432'
+      - 5432:5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -21,11 +21,11 @@ services:
     volumes:
       - ./Vol-PF-Minio:/data
     environment:
-      MINIO_ACCESS_KEY: "minioadmin"
-      MINIO_SECRET_KEY: 'minioadmin'
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
     ports:
-      - '9000:9000'
-      - '9001:9001'
+      - 9000:9000
+      - 9001:9001
     command: server /data --console-address ":9001"
   
   PF-mongodb:
@@ -34,31 +34,17 @@ services:
     volumes:
       - ./Vol-PF-Mongo:/data/db
     ports:
-      - '5000:27017'
+      - 5000:27017
 
-  # PF-api:
-  #   container_name: PF-api
-  #   image: ...
-  #   environment:
-  #     DB_File_Upload_HOST: PF-db-file-upload
-  #     DB_Metadata_Extractor_HOST: PF-db-metadata-extractor
-  #     DB_Page_Splitter_HOST: PF-db-page-splitter
-  #     DB_Text_Extractor_HOST: PF-db-text-extractor
-  #     DB_File_Upload_PORT: 5001
-  #     DB_Metadata_Extractor_PORT: 5002
-  #     DB_Page_Splitter_PORT: 5003
-  #     DB_Text_Extractor_PORT: 5004
-  #     DB_File_Upload_NAME: file_upload
-  #     DB_Metadata_Extractor_NAME: metadata_extractor
-  #     DB_Page_Splitter_NAME: page_splitter
-  #     DB_Text_Extractor_NAME: text_extractor
-  #     DB_USER: postgres
-  #     DB_PASSWORD: postgres
-  #     LOG_LEVEL: DEBUG
-  #   depends_on:
-  #     - PF-db-file-upload
-  #     - PF-db-metadata-extractor
-  #     - PF-db-page-splitter
-  #     - PF-db-text-extractor
-  #   ports:
-  #     - 3000:80
+  PF-api:
+    container_name: PF-api
+    build: .
+    image: pf-image:regular
+    depends_on:
+      - PF-postgres
+      - PF-minio
+      - PF-mongodb
+    env_file:
+      - .env
+    ports:
+      - 3000:3000

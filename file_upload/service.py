@@ -6,7 +6,7 @@ from file_upload.db_connection import session
 from file_upload.models import File
 import globals
 from connection.minio_client_connection import minioClient
-from supporting_files.logs import logger
+from supporting.logs import logger
 from fastapi import HTTPException,status
 
 

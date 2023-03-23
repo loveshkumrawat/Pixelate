@@ -1,4 +1,11 @@
+<<<<<<< HEAD
 import pymongo
+=======
+# Require to wait for the services to start
+from time import sleep
+sleep(5)
+
+>>>>>>> 715906921d29971bab8ab9d6cf033f13475ed9d0
 import uvicorn as uvicorn
 from fastapi import FastAPI, UploadFile, HTTPException, status
 from file_upload.service import upload_file_to_minio
@@ -57,5 +64,4 @@ def get_meta_data(file_id: int, page_no: int):
     #     return x
 
 
-if __name__ == '__main__':
-    uvicorn.run("router:app", port=8001, reload=True)
+if __name__ == '__main__': uvicorn.run("router:app", port=3000, reload=True)
