@@ -20,3 +20,7 @@
 **/Metadata-Extractor-Vol/
 **/Page-Splitter-Vol/
 **/Text-Extractor-Vol/
+**/Vol-PF-Minio/
+**/Vol-PF-Mongo/
+**/Vol-PF-postgres/
+

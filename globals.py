@@ -1,2 +1,2 @@
-bucket_name='mybucket'
+bucket_name='files'
 
