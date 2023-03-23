@@ -6,4 +6,3 @@ except:
     print('connection not successful')
 
 database = client['text_extractor']
-

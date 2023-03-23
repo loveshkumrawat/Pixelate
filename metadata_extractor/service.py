@@ -88,7 +88,7 @@ def extract_text(file_id: int, file_name: str):
             data.error = f'{e}'
             session.commit()
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                                detail='error in text_extracting')
+                                detail=f'{e}')
 
 
 def set_global_var(d, n_boxes):
