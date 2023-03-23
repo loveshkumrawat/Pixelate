@@ -11,8 +11,8 @@ services:
     ports:
       - '5432:5432'
     environment:
-      postgres_user: postgres
-      postgres_password: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
 
 
   PF-minio:
