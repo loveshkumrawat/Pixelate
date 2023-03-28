@@ -2,7 +2,6 @@
 **/.vscode/
 **/__pycache__/
 **/files/
-**/README.md
 **/temp/
 **/.logrecord
 **/log_file.log
@@ -11,12 +10,6 @@
 **/templates/
 **/venv/
 **/.logstore
-**/PF-Minio-Vol/
-**/PF-Mongo-Vol/
-**/File-Upload-Vol/
-**/Metadata-Extractor-Vol/
-**/Page-Splitter-Vol/
-**/Text-Extractor-Vol/
 **/Vol-PF-Minio/
 **/Vol-PF-Mongo/
 **/Vol-PF-postgres/
