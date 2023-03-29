@@ -1,10 +1,9 @@
-import pymongo
 # Require to wait for the services to start
 from time import sleep
-
 sleep(5)
 
-import uvicorn as uvicorn
+import pymongo
+import uvicorn
 from fastapi import FastAPI, UploadFile, HTTPException, status
 from file_upload.service import upload_file_to_minio
 from page_splitter.service import convert_to_image
