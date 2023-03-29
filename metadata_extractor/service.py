@@ -10,7 +10,7 @@ from metadata_extractor.mongo_db_connection import database
 from metadata_extractor.models import MetaDataExtractor
 from metadata_extractor.db_connection import session
 
-global pre_word_block, pre_word_para, pre_word_line
+global pre_word_block, pre_word_para, pre_word_line,first_word_x, first_word_y, last_word_x, last_word_y
 
 
 def extract_text(file_id: int, file_name: str):
@@ -62,7 +62,7 @@ def extract_text(file_id: int, file_name: str):
                 my_file.update({"top": y})
                 my_file.update({"left": x})
                 my_file.update({"bottom": x + w})
-                my_file.update({"height": y + h})
+                my_file.update({"right": y - h})
 
                 pre_word_block = d['block_num'][i]
                 pre_word_para = d['par_num'][i]
@@ -98,12 +98,25 @@ def extract_text(file_id: int, file_name: str):
 
 
 def check_line_change(i, d, line_list, word_list):
-    global pre_word_block, pre_word_para, pre_word_line
+    global pre_word_line, first_word_x, first_word_y, last_word_x, last_word_y
+
     line_dict = {}
+    first_word_x = word_list[0]['top']
+    first_word_y = word_list[0]['left']
+    last_word_x = word_list[len(word_list) - 1]['bottom']
+    last_word_y = word_list[len(word_list) - 1]['right']
+
     line_dict.update({"line_no": pre_word_line})
     temp_word_list = list(word_list)
     line_dict.update({"words": temp_word_list})
     word_list.clear()
+
+    line_dict.update({"categories": ['line']})
+    line_dict.update({"left": first_word_x})
+    line_dict.update({"top": first_word_y})
+    line_dict.update({"bottom": last_word_x})
+    line_dict.update({"right": last_word_y})
+
     line_list.append(line_dict)
     if i != len(d['level']):
         pre_word_line = d['line_num'][i]
@@ -121,53 +134,59 @@ def set_global_var(d, n_boxes):
 
 
 def check_block_change(i, d, word_list, para_list, block_list, line_list):
-    global pre_word_block, pre_word_para
-    para_dict = {}
+    global pre_word_block,first_word_x,first_word_y,last_word_x,last_word_y
+
     block_dict = {}
-    line_dict = {}
 
-    line_dict.update({'line_no': pre_word_line})
-    temp_word_list = list(word_list)
-    line_dict.update({'words': temp_word_list})
-    line_list.append(line_dict)
-    word_list.clear()
+    first_word_x = word_list[0]['top']
+    first_word_y = word_list[0]['left']
+    last_word_x = word_list[len(word_list) - 1]['bottom']
+    last_word_y = word_list[len(word_list) - 1]['right']
 
-    para_dict.update({"para_no": pre_word_para})
-    temp_line_list = list(line_list)
-    para_dict.update({"lines": temp_line_list})
-    para_list.append(para_dict)
-    line_list.clear()
+    check_para_change(i, d, para_list, word_list, line_list)
 
     block_dict.update({'block_no': pre_word_block})
     temp_para_list = list(para_list)
     block_dict.update({"paragraphs": temp_para_list})
+
+    block_dict.update({"categories": ['para']})
+    block_dict.update({"left": first_word_x})
+    block_dict.update({"top": first_word_y})
+    block_dict.update({"bottom": last_word_x})
+    block_dict.update({"right": last_word_y})
     block_list.append(block_dict)
     para_list.clear()
 
     if i != len(d['level']):
         pre_word_block = d['block_num'][i]
-        pre_word_para = d['par_num'][i]
 
 
 def check_para_change(i, d, para_list, word_list, line_list):
-    global pre_word_block, pre_word_para ,pre_word_line
+    global pre_word_para,first_word_x,first_word_y,last_word_x,last_word_y
     para_dict = {}
-    line_dict = {}
 
-    line_dict.update({'line_no': pre_word_line})
-    temp_word_list = list(word_list)
-    line_dict.update({'words': temp_word_list})
-    line_list.append(line_dict)
-    word_list.clear()
+    first_word_x = word_list[0]['top']
+    first_word_y = word_list[0]['left']
+    last_word_x = word_list[len(word_list) - 1]['bottom']
+    last_word_y = word_list[len(word_list) - 1]['right']
 
+    check_line_change(i, d, line_list, word_list)
     para_dict.update({"para_no": pre_word_para})
     temp_line_list = list(line_list)
     para_dict.update({"lines": temp_line_list})
+
+    para_dict.update({"categories": ['para']})
+    para_dict.update({"left": first_word_x})
+    para_dict.update({"top": first_word_y})
+    para_dict.update({"bottom": last_word_x})
+    para_dict.update({"right": last_word_y})
+
     para_list.append(para_dict)
     line_list.clear()
 
+
+
     if i != len(d['level']):
-        pre_word_line= d['par_num'][i]
         pre_word_para = d['par_num'][i]
 
 
@@ -180,8 +199,3 @@ def get_no_of_pages(file_id):
     )
     return objects
 
-#             img = Image.open(io.BytesIO(response.data))
-#             white_bg = Image.new(mode = 'RGB', size = img.size, color = (255, 255, 255))
-#             alpha_channel = img.split()[3] if img.mode == "RGBA" else Image.new("L", img.size, 255)
-#             white_bg.paste(img, mask=alpha_channel)
-#             d = pytesseract.image_to_data(white_bg, output_type=Output.DICT)
