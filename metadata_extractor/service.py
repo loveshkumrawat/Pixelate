@@ -10,7 +10,7 @@ from metadata_extractor.mongo_db_connection import database
 from metadata_extractor.models import MetaDataExtractor
 from metadata_extractor.db_connection import session
 
-global pre_word_block, pre_word_para, pre_word_line,first_word_x, first_word_y, last_word_x, last_word_y
+global pre_word_block, pre_word_para, pre_word_line
 
 
 def extract_text(file_id: int, file_name: str):
@@ -61,8 +61,8 @@ def extract_text(file_id: int, file_name: str):
                 my_file.update({"word": text})
                 my_file.update({"top": y})
                 my_file.update({"left": x})
-                my_file.update({"bottom": x + w})
-                my_file.update({"right": y - h})
+                my_file.update({"bottom": y + h})
+                my_file.update({"right": x + w})
 
                 pre_word_block = d['block_num'][i]
                 pre_word_para = d['par_num'][i]
@@ -79,7 +79,7 @@ def extract_text(file_id: int, file_name: str):
             elif len(ans_dict['blocks']) != 0 and ans_dict['blocks'][len(ans_dict['blocks']) - 1]['paragraphs'][
                 len(ans_dict['blocks'][len(ans_dict['blocks']) - 1]['paragraphs']) - 1]['para_no']:
                 check_para_change(i, d, para_list, word_list, line_list)
-
+            print(ans_dict)
             collection = database[f'{file_id}']
             collection.insert_one(ans_dict)
 
@@ -93,18 +93,19 @@ def extract_text(file_id: int, file_name: str):
             data.status = 'unsuccessful'
             data.error = f'{e}'
             session.commit()
+            print(e)
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                                 detail=f'{e}')
 
 
 def check_line_change(i, d, line_list, word_list):
-    global pre_word_line, first_word_x, first_word_y, last_word_x, last_word_y
+    global pre_word_line
 
     line_dict = {}
-    first_word_x = word_list[0]['top']
-    first_word_y = word_list[0]['left']
-    last_word_x = word_list[len(word_list) - 1]['bottom']
-    last_word_y = word_list[len(word_list) - 1]['right']
+    l_first_word_y = word_list[0]['top']
+    l_first_word_x = word_list[0]['left']
+    l_last_word_x = word_list[len(word_list) - 1]['right']
+    l_last_word_y = word_list[len(word_list) - 1]['bottom']
 
     line_dict.update({"line_no": pre_word_line})
     temp_word_list = list(word_list)
@@ -112,12 +113,13 @@ def check_line_change(i, d, line_list, word_list):
     word_list.clear()
 
     line_dict.update({"categories": ['line']})
-    line_dict.update({"left": first_word_x})
-    line_dict.update({"top": first_word_y})
-    line_dict.update({"bottom": last_word_x})
-    line_dict.update({"right": last_word_y})
+    line_dict.update({"top": l_first_word_y})
+    line_dict.update({"left": l_first_word_x})
+    line_dict.update({"bottom": l_last_word_y})
+    line_dict.update({"right": l_last_word_x})
 
     line_list.append(line_dict)
+
     if i != len(d['level']):
         pre_word_line = d['line_num'][i]
 
@@ -134,26 +136,27 @@ def set_global_var(d, n_boxes):
 
 
 def check_block_change(i, d, word_list, para_list, block_list, line_list):
-    global pre_word_block,first_word_x,first_word_y,last_word_x,last_word_y
+    global pre_word_block
 
     block_dict = {}
 
-    first_word_x = word_list[0]['top']
-    first_word_y = word_list[0]['left']
-    last_word_x = word_list[len(word_list) - 1]['bottom']
-    last_word_y = word_list[len(word_list) - 1]['right']
-
     check_para_change(i, d, para_list, word_list, line_list)
+
+    b_first_word_x = para_list[0]['lines'][0]["words"][0]['left']
+    b_first_word_y = para_list[0]['lines'][0]["words"][0]['top']
+    b_last_word_x = para_list[len(para_list)-1]['lines'][len(para_list[len(para_list)-1]['lines'])-1]['words'][len(para_list[len(para_list)-1]['lines'][len(para_list[len(para_list)-1]['lines'])-1]['words'])-1]['right']
+    b_last_word_y = para_list[len(para_list)-1]['lines'][len(para_list[len(para_list)-1]['lines'])-1]['words'][len(para_list[len(para_list)-1]['lines'][len(para_list[len(para_list)-1]['lines'])-1]['words'])-1]['bottom']
 
     block_dict.update({'block_no': pre_word_block})
     temp_para_list = list(para_list)
     block_dict.update({"paragraphs": temp_para_list})
 
-    block_dict.update({"categories": ['para']})
-    block_dict.update({"left": first_word_x})
-    block_dict.update({"top": first_word_y})
-    block_dict.update({"bottom": last_word_x})
-    block_dict.update({"right": last_word_y})
+    block_dict.update({"categories": ['block']})
+    block_dict.update({"top": b_first_word_y})
+    block_dict.update({"left": b_first_word_x})
+    block_dict.update({"bottom": b_last_word_y})
+    block_dict.update({"right": b_last_word_x})
+
     block_list.append(block_dict)
     para_list.clear()
 
@@ -162,29 +165,28 @@ def check_block_change(i, d, word_list, para_list, block_list, line_list):
 
 
 def check_para_change(i, d, para_list, word_list, line_list):
-    global pre_word_para,first_word_x,first_word_y,last_word_x,last_word_y
+    global pre_word_para
     para_dict = {}
 
-    first_word_x = word_list[0]['top']
-    first_word_y = word_list[0]['left']
-    last_word_x = word_list[len(word_list) - 1]['bottom']
-    last_word_y = word_list[len(word_list) - 1]['right']
-
     check_line_change(i, d, line_list, word_list)
+
+    p_first_word_x = line_list[0]['words'][0]['left']
+    p_first_word_y = line_list[0]['words'][0]['top']
+    p_last_word_x = line_list[len(line_list) - 1]['words'][len(line_list[len(line_list) - 1]['words']) - 1]['right']
+    p_last_word_y = line_list[len(line_list) - 1]['words'][len(line_list[len(line_list) - 1]['words']) - 1]['bottom']
+
     para_dict.update({"para_no": pre_word_para})
     temp_line_list = list(line_list)
     para_dict.update({"lines": temp_line_list})
 
     para_dict.update({"categories": ['para']})
-    para_dict.update({"left": first_word_x})
-    para_dict.update({"top": first_word_y})
-    para_dict.update({"bottom": last_word_x})
-    para_dict.update({"right": last_word_y})
+    para_dict.update({"top": p_first_word_y})
+    para_dict.update({"left": p_first_word_x})
+    para_dict.update({"bottom": p_last_word_y})
+    para_dict.update({"right": p_last_word_x})
 
     para_list.append(para_dict)
     line_list.clear()
-
-
 
     if i != len(d['level']):
         pre_word_para = d['par_num'][i]
@@ -198,4 +200,5 @@ def get_no_of_pages(file_id):
         recursive=True
     )
     return objects
+
 

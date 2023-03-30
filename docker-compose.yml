@@ -39,6 +39,8 @@ services:
   PF-api:
     container_name: PF_API
     build: .
+    volumes:
+      - .:/app
     image: pf-image:regular
     depends_on:
       - PF-postgres
