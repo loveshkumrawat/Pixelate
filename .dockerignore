@@ -3,7 +3,6 @@
 /__pycache__/
 /files/
 /temp/
-/.logrecord
 /log_file.log
 /services/
 /frontend/

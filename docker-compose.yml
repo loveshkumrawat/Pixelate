@@ -37,10 +37,18 @@ services:
       - 5000:27017
 
   PF-api:
-    container_name: PF_API
+    container_name: PF-api
     build: .
     volumes:
-      - .:/app
+      - ./router.py:/app/router.py
+      - ./globals.py:/app/globals.py
+      - ./.logrecord:/app/.logrecord
+      - ./connection:/app/connection
+      - ./file_upload:/app/file_upload
+      - ./metadata_extractor:/app/metadata_extractor
+      - ./page_splitter:/app/page_splitter
+      - ./supporting:/app/supporting
+      - ./text_extractor:/app/text_extractor
     image: pf-image:regular
     depends_on:
       - PF-postgres
