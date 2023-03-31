@@ -12,6 +12,11 @@ from fastapi import HTTPException, status
 
 def upload_file_to_minio(data, filename:str):
 
+    # check if file is empty or not
+    if not data:
+        logger.warn("Uploaded File is Empty")
+        raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail="Uploaded File is Empty")
+
     bucket = minioClient.bucket_exists(globals.bucket_name)
     if not bucket: minioClient.make_bucket(globals.bucket_name)
     

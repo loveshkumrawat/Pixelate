@@ -4,6 +4,7 @@ sleep(5)
 
 import pymongo
 import uvicorn
+from supporting.logs import logger
 from fastapi import FastAPI, UploadFile, HTTPException, status
 from file_upload.service import upload_file_to_minio
 from page_splitter.service import convert_to_image
@@ -16,32 +17,22 @@ app = FastAPI()
 
 @app.post("/extractor")
 def add_file(file: UploadFile):
-    try:
 
-        # check if file is empty or not
-        data = file.file.read()
-        if not data:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Uploaded File is Empty")
+    # upload file
+    file_id: int = upload_file_to_minio(file.file.read(), file.filename)
 
-        # upload file
-        file_id: int = upload_file_to_minio(data, file.filename)
+    # page splitter
+    convert_to_image(file_id, file.filename)
 
-        # page splitter
-        convert_to_image(file_id, file.filename)
+    # text extractor
+    text_extract_from_file(file_id, file.filename)
 
-        # text extractor
-        text_extract_from_file(file_id, file.filename)
+    # metadata extractor
+    extract_text(file_id, file.filename)
+    logger.info(f'Metadata extracted from file with {file_id} file id')
 
-        # metadata extractor
-        extract_text(file_id, file.filename)
-
-        # return Successful message
-        return {"message": "Extraction Done",
-                "file_id": file_id}
-
-    except Exception as e:
-        print(e)
-        return {"message": e}
+    # return Successful message
+    return {"message": "Extraction Done", "file_id": file_id}
 
 
 @app.get("/getData")
