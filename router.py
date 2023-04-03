@@ -9,7 +9,7 @@ from fastapi import FastAPI, UploadFile
 from file_upload.service import upload_file_to_minio
 from page_splitter.service import convert_to_image
 from text_extractor.service import text_extract_from_file
-from metadata_extractor.service import extract_text
+from metadata_extractor.service import extract_metadata
 from metadata_extractor.mongo_db_connection import database
 
 app = FastAPI()
@@ -28,7 +28,7 @@ def add_file(file: UploadFile):
     text_extract_from_file(file_id, file.filename)
 
     # Metadata Extractor Service
-    extract_text(file_id, file.filename)
+    extract_metadata(file_id, file.filename)
 
     # Successful completion of all the services
     logger.info(f"Extraction Done for file_id: {file_id}")
