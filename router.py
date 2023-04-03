@@ -5,7 +5,7 @@ sleep(5)
 import pymongo
 import uvicorn
 from supporting.logs import logger
-from fastapi import FastAPI, UploadFile, HTTPException, status
+from fastapi import FastAPI, UploadFile
 from file_upload.service import upload_file_to_minio
 from page_splitter.service import convert_to_image
 from text_extractor.service import text_extract_from_file
@@ -18,20 +18,20 @@ app = FastAPI()
 @app.post("/extractor")
 def add_file(file: UploadFile):
 
-    # upload file
+    # Upload File Service
     file_id: int = upload_file_to_minio(file.file.read(), file.filename)
 
-    # page splitter
+    # Page Splitter Service
     convert_to_image(file_id, file.filename)
 
-    # text extractor
+    # Text Extractor Service
     text_extract_from_file(file_id, file.filename)
 
-    # metadata extractor
+    # Metadata Extractor Service
     extract_text(file_id, file.filename)
-    logger.info(f'Metadata extracted from file with {file_id} file id')
 
-    # return Successful message
+    # Successful completion of all the services
+    logger.info(f"Extraction Done for file_id: {file_id}")
     return {"message": "Extraction Done", "file_id": file_id}
 
 

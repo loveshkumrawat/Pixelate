@@ -3,7 +3,7 @@ from datetime import datetime
 from fastapi import HTTPException, status
 import fitz
 from minio import S3Error
-import globals
+from supporting.helper import bucket_name
 from connection.minio_client_connection import minioClient
 from file_upload.db_connection import session
 from supporting.logs import logger
@@ -18,7 +18,7 @@ def convert_to_image(file_id: int, file_name: str):
     
     doc = fitz.open(stream=response.data, filetype="pdf")
     
-    for page in doc:
+    for page_no, page in enumerate(doc):
         
         try:
             pix = page.get_pixmap(
@@ -29,6 +29,8 @@ def convert_to_image(file_id: int, file_name: str):
                 alpha=False,
                 annots=True
             )
+            
+            logger.debug(f"Page '{page_no}' converted to image")
         
         except Exception as e:
             data_entry.status = 'unsuccessful'
@@ -43,12 +45,14 @@ def convert_to_image(file_id: int, file_name: str):
             img_bytes = pix.tobytes()
 
             minioClient.put_object(
-                bucket_name=globals.bucket_name,
+                bucket_name=bucket_name,
                 object_name=f"{file_id}/pages/page{page.number}/{page_name}",
                 data=io.BytesIO(img_bytes),
                 length=len(img_bytes),
                 content_type="img/png"
             )
+
+            logger.debug(f"Page '{page_no}' uploaded to minio")
 
         except Exception as e:
             data_entry.status = 'unsuccessful'
@@ -58,26 +62,26 @@ def convert_to_image(file_id: int, file_name: str):
             logger.error("error while image uploading", exc_info=e)
             raise HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="error while image uploading")
 
-        data_entry.submission_time = datetime.now()
-        data_entry.status = 'successful'
-        data_entry.error = 'NULL'
-        session.commit()
-        
-        logger.info(f'File converted to image with {file_id} file id')
+    data_entry.submission_time = datetime.now()
+    data_entry.status = 'successful'
+    session.commit()
+    
+    logger.info(f'File converted to images with {file_id} file id')
 
 
 def get_file_from_minio(file_id: int, file_name: str):
     
     try:
         response = minioClient.get_object(
-            bucket_name=globals.bucket_name,
+            bucket_name=bucket_name,
             object_name=f"{file_id}/files/{file_name}"
         )
 
-        logger.info(f"File data fetched with {file_id} file id")
+        logger.debug(f"File data fetched with {file_id} file id")
         return response
     
     except S3Error as e:
+        
         logger.error("error in fetching file data from minio", exc_info=e)
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="error in fetching file data from minio")
 
@@ -88,10 +92,12 @@ def add_file_details_to_db(file_id: int, file_name: str):
         file = PageSplitter(id=file_id, file_name=file_name, fetch_time=datetime.now())
         session.add(file)
         session.commit()
-        logger.info('file details added in database')
+
+        logger.debug(f"File details added to 'Page Splitter' database")
         return file
 
     except S3Error as e:
+        
         logger.error("error in adding file details to 'Page Splitter' database", exc_info=e)
         raise HTTPException(
             status_code=status.HTTP_304_NOT_MODIFIED,

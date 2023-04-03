@@ -9,7 +9,6 @@ class MetaDataExtractor(base):
     fetch_time = Column(DateTime, nullable=False)
     status = Column(String(64), nullable=True)
     error = Column(String(128), nullable=True)
-    error = Column(TEXT, nullable=True)
     submission_time = Column(DateTime, nullable=True)
 
 
