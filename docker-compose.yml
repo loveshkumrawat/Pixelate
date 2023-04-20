@@ -36,25 +36,51 @@ services:
     ports:
       - 5000:27017
 
-  PF-api:
-    container_name: PF-api
-    build: .
-    volumes:
-      - ./router.py:/app/router.py
-      - ./globals.py:/app/globals.py
-      - ./.logrecord:/app/.logrecord
-      - ./connection:/app/connection
-      - ./file_upload:/app/file_upload
-      - ./metadata_extractor:/app/metadata_extractor
-      - ./page_splitter:/app/page_splitter
-      - ./supporting:/app/supporting
-      - ./text_extractor:/app/text_extractor
-    image: pf-image:regular
-    depends_on:
-      - PF-postgres
-      - PF-minio
-      - PF-mongodb
-    env_file:
-      - .env
+  PF-zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: PF-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
     ports:
-      - 3000:3000
+      - 22181:2181
+
+  PF-kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: PF-kafka
+    depends_on:
+      - PF-zookeeper
+    ports:
+      - 29092:29092
+      - 29093:29093
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: PF-zookeeper:2181
+      KAFKA_LISTENERS: EXTERNAL_SAME_HOST://:29092, EXTERNAL_DIFFERENT_HOST://:29093, INTERNAL://:9092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://PF-kafka:9092, EXTERNAL_SAME_HOST://localhost:29092, EXTERNAL_DIFFERENT_HOST://192.168.100.140:29093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT, EXTERNAL_SAME_HOST:PLAINTEXT, EXTERNAL_DIFFERENT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  # PF-api:
+  #   container_name: PF-api
+  #   build: .
+  #   volumes:
+  #     - ./router.py:/app/router.py
+  #     - ./tasks.py:/app/tasks.py
+  #     - ./.logrecord:/app/.logrecord
+  #     - ./connection:/app/connection
+  #     - ./file_upload:/app/file_upload
+  #     - ./metadata_extractor:/app/metadata_extractor
+  #     - ./page_splitter:/app/page_splitter
+  #     - ./supporting:/app/supporting
+  #     - ./text_extractor:/app/text_extractor
+  #   image: pf-image:regular
+  #   depends_on:
+  #     - PF-postgres
+  #     - PF-minio
+  #     - PF-mongodb
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - 3000:3000

@@ -14,3 +14,6 @@ MINIO_SECRET_KEY = environ.get("MINIO_SECRET_KEY", "minioadmin")
 
 MONGO_DB_HOST = environ.get("MONGO_DB_HOST", "localhost")
 MONGO_DB_PORT = environ.get("MONGO_DB_PORT", "5000")
+
+KAFKA_HOST = environ.get("KAFKA_HOST", "localhost")
+KAFKA_PORT = environ.get("KAFKA_PORT", "29092")

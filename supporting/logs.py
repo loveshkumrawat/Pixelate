@@ -11,7 +11,7 @@ logging.basicConfig(
 
 logger = logging.getLogger('API')
 logger.setLevel(env.LOG_LEVEL)
-console = logging.StreamHandler()
-console.setLevel(env.LOG_LEVEL)
-console.setFormatter(logging.Formatter(log_format))
-logger.addHandler(console)
+# console = logging.StreamHandler()
+# console.setLevel(env.LOG_LEVEL)
+# console.setFormatter(logging.Formatter(log_format))
+# logger.addHandler(console)
