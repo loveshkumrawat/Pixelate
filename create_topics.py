@@ -31,6 +31,12 @@ try:
 			num_partitions=4,
 			replication_factor=1,
 			topic_configs=topic_configs
+		),
+		NewTopic(
+			name='text_meta_T',
+			num_partitions=4,
+			replication_factor=1,
+			topic_configs=topic_configs
 		)
 	])
 except Exception as e: print(e)

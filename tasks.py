@@ -1,12 +1,10 @@
 # faust -A tasks worker -l info --web-port 600_
 
-import json
 import faust
-from typing import List
 from faust import TopicT
 from supporting import env
-from connection.kafka_broker import producer
-from file_upload.service import upload_file_to_minio
+from supporting.helper import chain_handler
+# from file_upload.service import upload_file_to_minio
 from page_splitter.service import convert_to_image
 from text_extractor.service import text_extract_from_file
 from metadata_extractor.service import extract_metadata
@@ -19,11 +17,12 @@ import create_topics
 page_splitter_T: TopicT = app.topic('page_splitter_T')
 text_extractor_T: TopicT = app.topic('text_extractor_T')
 metadata_extractor_T: TopicT = app.topic('metadata_extractor_T')
+text_meta_T: TopicT = app.topic('text_meta_T')
 
 # @app.agent(channel=file_upload_T, concurrency=2)
-# async def upload_file_to_minio_agent(reference_stream : faust.streams.Stream):
+# async def upload_file_to_minio_agent(payload_stream : faust.streams.Stream):
 	
-# 	async for reference in reference_stream:
+# 	async for reference in payload_stream:
 
 #		import base64
 # 		file_data = base64.b64decode(reference['file_data'])
@@ -41,52 +40,70 @@ metadata_extractor_T: TopicT = app.topic('metadata_extractor_T')
 # 		producer.flush()
 
 @app.agent(channel=page_splitter_T, concurrency=2)
-async def convert_to_image_agent(reference_stream : faust.streams.Stream):
+async def convert_to_image_agent(payload_stream : faust.streams.Stream):
 
-	async for reference in reference_stream:
+	async for payload in payload_stream:
 		
 		# Page Splitter Service
-		convert_to_image(**reference)
+		convert_to_image(**payload["reference"])
+		
+		# Chain Handler
+		payload["offset"] += 1
+		chain_handler(payload, executed_channel="page_splitter_T")
 
-		# Dependency Injections
-		producer.produce(
-			topic='text_extractor_T',
-			value=json.dumps(reference),
-			partition=0
-		)
+		# # Dependency Injections
+		# producer.produce(
+		# 	topic='text_extractor_T',
+		# 	value=json.dumps(payload),
+		# 	partition=0
+		# )
 
-		producer.produce(
-			topic='metadata_extractor_T',
-			value=json.dumps(reference),
-			partition=3
-		)
+		# producer.produce(
+		# 	topic='metadata_extractor_T',
+		# 	value=json.dumps(payload),
+		# 	partition=3
+		# )
 
-		producer.flush()
+		# producer.flush()
 		
 		# await text_extractor_T.send(key="text_extractor", partition=0, value=json.dumps(reference))
 		# await metadata_extractor_T.send(key="metadata_extractor", partition=3, value=json.dumps(reference))
 
 @app.agent(channel=text_extractor_T, concurrency=2)
-async def text_extract_from_file_agent(reference_stream : faust.streams.Stream):
+async def text_extract_from_file_agent(payload_stream : faust.streams.Stream):
 
-	async for reference in reference_stream:
+	async for payload in payload_stream:
 		
 		# Text Extractor Service
-		text_extract_from_file(**reference)
+		text_extract_from_file(**payload["reference"])
 
-		# Dependency Injections
-		...
+		# Chain Handler
+		payload["offset"] += 1
+		chain_handler(payload, executed_channel="text_extractor_T")
 
 @app.agent(channel=metadata_extractor_T, concurrency=2)
-async def extract_metadata_agent(reference_stream : faust.streams.Stream):
+async def extract_metadata_agent(payload_stream : faust.streams.Stream):
 
-	async for reference in reference_stream:
+	async for payload in payload_stream:
 		
 		# Metadata Extractor Service
-		extract_metadata(**reference)
+		extract_metadata(**payload["reference"])
 
-		# Dependency Injections
-		...
+		# Chain Handler
+		payload["offset"] += 1
+		chain_handler(payload, executed_channel="metadata_extractor_T")
+
+@app.agent(channel=text_meta_T, concurrency=2)
+async def text_meta_agent(payload_stream : faust.streams.Stream):
+	
+	async for payload in payload_stream:
+		
+		# Text Meta Service
+		print(f"After Text & Meta Extraction for {payload['reference']['file_id']}")
+
+		# Chain Handler
+		payload["offset"] += 1
+		chain_handler(payload, executed_channel="text_meta_T")
 
 # extract_metadata_agent.add_dependency(text_extract_from_file_agent)
 

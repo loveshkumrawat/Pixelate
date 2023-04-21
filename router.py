@@ -2,12 +2,11 @@
 # from time import sleep
 # sleep(5)
 
-import json
 import pymongo
 import uvicorn
 from supporting.logs import logger
 from fastapi import FastAPI, UploadFile
-from connection.kafka_broker import producer
+from supporting.helper import chain_handler
 from file_upload.service import upload_file_to_minio
 from page_splitter.service import convert_to_image
 from text_extractor.service import text_extract_from_file
@@ -21,17 +20,28 @@ def process_file(file: UploadFile):
     
     file_id: int = upload_file_to_minio(file.file.read(), file.filename)
     
-    # Dependency Injections
-    producer.produce(
-        topic='page_splitter_T',
-        partition=1,
-        value=json.dumps({
-            'file_id': file_id,
-            'file_name': file.filename
-        })
-    )
+    payload = {
+        "reference": {
+            "file_id": file_id,
+            "file_name": file.filename
+        },
+        "offset": 0
+    }
     
-    producer.flush()
+    # Chain Handler
+    chain_handler(payload)
+    
+    # # Dependency Injections
+    # producer.produce(
+    #     topic='page_splitter_T',
+    #     partition=1,
+    #     value=json.dumps({
+    #         'file_id': file_id,
+    #         'file_name': file.filename
+    #     })
+    # )
+    
+    # producer.flush()
     
     return {"message": f"File Processing: {file.filename}"}
 
