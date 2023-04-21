@@ -1,4 +1,4 @@
-# faust -A tasks worker -l info
+# faust -A tasks worker -l info --web-port 600_
 
 import json
 import faust
@@ -21,7 +21,7 @@ text_extractor_T: TopicT = app.topic('text_extractor_T')
 metadata_extractor_T: TopicT = app.topic('metadata_extractor_T')
 
 # @app.agent(channel=file_upload_T, concurrency=2)
-# async def upload_file_to_minio_agent(reference_stream : List[str]):
+# async def upload_file_to_minio_agent(reference_stream : faust.streams.Stream):
 	
 # 	async for reference in reference_stream:
 
@@ -41,7 +41,7 @@ metadata_extractor_T: TopicT = app.topic('metadata_extractor_T')
 # 		producer.flush()
 
 @app.agent(channel=page_splitter_T, concurrency=2)
-async def convert_to_image_agent(reference_stream : List[str]):
+async def convert_to_image_agent(reference_stream : faust.streams.Stream):
 
 	async for reference in reference_stream:
 		
@@ -51,18 +51,23 @@ async def convert_to_image_agent(reference_stream : List[str]):
 		# Dependency Injections
 		producer.produce(
 			topic='text_extractor_T',
-			value=json.dumps(reference)
+			value=json.dumps(reference),
+			partition=0
 		)
 
 		producer.produce(
 			topic='metadata_extractor_T',
-			value=json.dumps(reference)
+			value=json.dumps(reference),
+			partition=3
 		)
 
 		producer.flush()
+		
+		# await text_extractor_T.send(key="text_extractor", partition=0, value=json.dumps(reference))
+		# await metadata_extractor_T.send(key="metadata_extractor", partition=3, value=json.dumps(reference))
 
 @app.agent(channel=text_extractor_T, concurrency=2)
-async def text_extract_from_file_agent(reference_stream : List[str]):
+async def text_extract_from_file_agent(reference_stream : faust.streams.Stream):
 
 	async for reference in reference_stream:
 		
@@ -73,7 +78,7 @@ async def text_extract_from_file_agent(reference_stream : List[str]):
 		...
 
 @app.agent(channel=metadata_extractor_T, concurrency=2)
-async def extract_metadata_agent(reference_stream : List[str]):
+async def extract_metadata_agent(reference_stream : faust.streams.Stream):
 
 	async for reference in reference_stream:
 		
@@ -82,3 +87,9 @@ async def extract_metadata_agent(reference_stream : List[str]):
 
 		# Dependency Injections
 		...
+
+# extract_metadata_agent.add_dependency(text_extract_from_file_agent)
+
+if __name__ == '__main__':
+	worker = app.Worker(loglevel='info')
+	worker.execute_from_commandline()

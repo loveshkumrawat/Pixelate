@@ -24,6 +24,7 @@ def process_file(file: UploadFile):
     # Dependency Injections
     producer.produce(
         topic='page_splitter_T',
+        partition=1,
         value=json.dumps({
             'file_id': file_id,
             'file_name': file.filename
