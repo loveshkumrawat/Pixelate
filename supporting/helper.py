@@ -1,21 +1,32 @@
 import json
+from typing import Dict
 from supporting import env
-from typing import Dict, Set
 from connection.kafka_broker import producer
+from connection.redis_conctn import redis_server
 from kafka.admin import NewTopic, KafkaAdminClient
 
 bucket_name :str = 'files'
-execution_dependency : Dict[int, Set[str]] = {}
 
-def load_chain():
+def load_chain(file_id: str):
 	
+	# Chain signature
+	chain_sig = f"Chain-{file_id}"
+	
+	# Get chain from cache
+	chain = redis_server.get(chain_sig)
+	if chain: return eval(chain)
+	
+	# Else load the chain
 	with open(".chain", "r") as f: chain = f.read()
+	redis_server.set(chain_sig, chain)
 	return eval(chain)
 
 def chain_handler(payload: Dict, executed_channel: str = None):
 	
+	file_id :int = payload["reference"]["file_id"]
+
 	# Loading the chain
-	chain = load_chain()
+	chain = load_chain(file_id)
 	
 	# Checking if the chain ended
 	if payload["offset"] == len(chain): return
@@ -24,18 +35,17 @@ def chain_handler(payload: Dict, executed_channel: str = None):
 	if executed_channel:
 		
 		# Adding the executed channel to the execution dependency
-		execution_dependency.setdefault(payload["reference"]["file_id"], set()).add(executed_channel)
-		print(f"{executed_channel} done executing | {payload['reference']['file_name']} | {payload['reference']['file_id']}")
+		redis_server.sadd(file_id, executed_channel)
+		print(f"{executed_channel} done executing | {payload['reference']['file_name']} | {file_id}")
 		
 		# Getting the previous chain
 		prev_chain = chain[payload["offset"] - 1]
 		prev_chain = {prev_chain} if isinstance(prev_chain, str) else set(prev_chain)
 		
-		#TODO: Problem while completion of all previous components at a same time
 		# Checking if the execution dependency is satisfied
-		if prev_chain - execution_dependency[payload["reference"]["file_id"]]: return
+		if prev_chain - redis_server.smembers(file_id): return
 		# Cleaning the unnecessary dependency
-		else: execution_dependency.pop(payload["reference"]["file_id"])
+		else: redis_server.delete(file_id)
 	
 	# Getting the next chain
 	next_chain = chain[payload["offset"]]
@@ -43,7 +53,7 @@ def chain_handler(payload: Dict, executed_channel: str = None):
 	
 	# Injecting the dependency injections
 	for component in next_chain:
-		print(f"{component} initiated")
+		print(f"{component} initiated | {payload['reference']['file_name']} | {file_id}")
 		producer.produce(
 			topic=component,
 			value=json.dumps(payload)

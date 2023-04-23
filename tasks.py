@@ -3,7 +3,7 @@
 import faust
 from faust import TopicT
 from supporting import env
-from supporting.logs import logger
+from connection.redis_conctn import redis_server
 from supporting.helper import chain_handler, create_topics
 from page_splitter.service import convert_to_image
 from text_extractor.service import text_extract_from_file
@@ -70,8 +70,14 @@ async def mark_complete_agent(payload_stream : faust.streams.Stream):
 	
 	async for payload in payload_stream:
 		
+		file_id = payload['reference']['file_id']
+		file_name = payload['reference']['file_name']
+		
 		# Mark complete service
-		print(f"Marking complete processing of {payload['reference']['file_name']} | {payload['reference']['file_id']}")
+		dependencies = redis_server.smembers(file_id)
+		redis_server.set(file_id, f"Error: dependencies left {dependencies}" if dependencies else f"File processed: {file_name} | {file_id}")
+		
+		print(f"Marking complete processing of {file_name} | {file_id}")
 
 		# Chain Handler
 		payload["offset"] += 1

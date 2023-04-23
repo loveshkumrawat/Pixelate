@@ -35,6 +35,12 @@ services:
       - ./Vol-PF-Mongo:/data/db
     ports:
       - 5000:27017
+  
+  PF-redis:
+    image: redislabs/rejson:latest
+    container_name: PF-redis
+    ports:
+      - 6379:6379
 
   PF-zookeeper:
     image: confluentinc/cp-zookeeper:latest

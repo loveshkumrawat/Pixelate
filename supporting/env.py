@@ -17,3 +17,6 @@ MONGO_DB_PORT = environ.get("MONGO_DB_PORT", "5000")
 
 KAFKA_HOST = environ.get("KAFKA_HOST", "localhost")
 KAFKA_PORT = environ.get("KAFKA_PORT", "29092")
+
+REDIS_HOST = environ.get("REDIS_HOST", "localhost")
+REDIS_PORT = environ.get("REDIS_PORT", "6379")
