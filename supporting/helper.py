@@ -1,7 +1,8 @@
 import json
+from supporting import env
 from typing import Dict, Set
-from supporting.logs import logger
 from connection.kafka_broker import producer
+from kafka.admin import NewTopic, KafkaAdminClient
 
 bucket_name :str = 'files'
 execution_dependency : Dict[int, Set[str]] = {}
@@ -17,21 +18,20 @@ def chain_handler(payload: Dict, executed_channel: str = None):
 	chain = load_chain()
 	
 	# Checking if the chain ended
-	if payload["offset"] == len(chain):
-		logger.info(f"File '{payload['reference']['file_name']}' has been processed successfully")
-		return
+	if payload["offset"] == len(chain): return
 
 	# Checking if any component has been done executing
 	if executed_channel:
 		
 		# Adding the executed channel to the execution dependency
 		execution_dependency.setdefault(payload["reference"]["file_id"], set()).add(executed_channel)
-		logger.info(f"Execution Dependency: {executed_channel} done executing for {payload['reference']['file_name']}")
+		print(f"{executed_channel} done executing | {payload['reference']['file_name']} | {payload['reference']['file_id']}")
 		
 		# Getting the previous chain
 		prev_chain = chain[payload["offset"] - 1]
 		prev_chain = {prev_chain} if isinstance(prev_chain, str) else set(prev_chain)
 		
+		#TODO: Problem while completion of all previous components at a same time
 		# Checking if the execution dependency is satisfied
 		if prev_chain - execution_dependency[payload["reference"]["file_id"]]: return
 		# Cleaning the unnecessary dependency
@@ -43,10 +43,29 @@ def chain_handler(payload: Dict, executed_channel: str = None):
 	
 	# Injecting the dependency injections
 	for component in next_chain:
-		print(component)
+		print(f"{component} initiated")
 		producer.produce(
 			topic=component,
 			value=json.dumps(payload)
 		)
 
 		producer.flush()
+
+def create_topics(components, num_partitions, replication_factor, topic_configs={"cleanup.policy":"delete", "delete.retention.ms":60}):
+
+	kafka_admin = KafkaAdminClient(bootstrap_servers=f"{env.KAFKA_HOST}:{env.KAFKA_PORT}")
+
+	try:
+		kafka_admin.create_topics([
+			NewTopic(
+				name=component,
+				num_partitions=num_partitions,
+				replication_factor=replication_factor,
+				topic_configs=topic_configs
+			)
+			
+			for component in components
+		])
+		return "Topics created"
+	
+	except Exception as e: return "Topics already exists"

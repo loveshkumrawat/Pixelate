@@ -31,19 +31,7 @@ def process_file(file: UploadFile):
     # Chain Handler
     chain_handler(payload)
     
-    # # Dependency Injections
-    # producer.produce(
-    #     topic='page_splitter_T',
-    #     partition=1,
-    #     value=json.dumps({
-    #         'file_id': file_id,
-    #         'file_name': file.filename
-    #     })
-    # )
-    
-    # producer.flush()
-    
-    return {"message": f"File Processing: {file.filename}"}
+    return {"message": f"File Processing: {file.filename} | {file_id}"}
 
 @app.post("/extractor")
 def add_file(file: UploadFile):
