@@ -61,7 +61,7 @@ def chain_handler(payload: Dict, executed_channel: str = None):
 
 		producer.flush()
 
-def create_topics(components, num_partitions, replication_factor, topic_configs={"cleanup.policy":"delete", "delete.retention.ms":60}):
+def create_topics(components, num_partitions, replication_factor, topic_configs={"cleanup.policy":"delete", "retention.ms":60}):
 
 	kafka_admin = KafkaAdminClient(bootstrap_servers=f"{env.KAFKA_HOST}:{env.KAFKA_PORT}")
 

@@ -7,6 +7,9 @@ kafka-topics --bootstrap-server localhost:9092 --topic page_splitter_T --delete
 # Describe topic
 kafka-topics --bootstrap-server localhost:9092 --topic page_splitter_T --describe
 
+# Alter topic partitions (increase)
+kafka-topics --bootstrap-server localhost:9092 --alter --topic page_splitter_T --partitions 6
+
 # List topics objects
 kafka-console-consumer --bootstrap-server localhost:9092 --topic page_splitter_T --from-beginning --timeout-ms 1000
 

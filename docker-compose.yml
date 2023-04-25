@@ -67,6 +67,18 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT, EXTERNAL_SAME_HOST:PLAINTEXT, EXTERNAL_DIFFERENT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  
+  PF-Kafka-UI:
+    container_name: PF-kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    depends_on:
+      - PF-kafka
+    ports:
+      - 8080:8080
+    environment:
+      DYNAMIC_CONFIG_ENABLED: true
+      KAFKA_CLUSTERS_0_NAME: text_extraction
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: PF-kafka:9092
 
   # PF-api:
   #   container_name: PF-api

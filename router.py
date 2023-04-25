@@ -4,6 +4,7 @@
 
 import pymongo
 import uvicorn
+from typing import List
 from supporting.logs import logger
 from fastapi import FastAPI, UploadFile
 from supporting.helper import chain_handler
@@ -16,22 +17,27 @@ from metadata_extractor.mongo_db_connection import database
 app = FastAPI()
 
 @app.post("/process-file")
-def process_file(file: UploadFile):
+def process_file(files: List[UploadFile]):
     
-    file_id: int = upload_file_to_minio(file.file.read(), file.filename)
+    processing_files = []
     
-    payload = {
-        "reference": {
-            "file_id": file_id,
-            "file_name": file.filename
-        },
-        "offset": 0
-    }
+    for file in files:
+
+        file_id: int = upload_file_to_minio(file.file.read(), file.filename)
+        processing_files.append((file_id, file.filename))
+
+        payload = {
+            "reference": {
+                "file_id": file_id,
+                "file_name": file.filename
+            },
+            "offset": 0
+        }
+        
+        # Chain Handler
+        chain_handler(payload)
     
-    # Chain Handler
-    chain_handler(payload)
-    
-    return {"message": f"File Processing: {file.filename} | {file_id}"}
+    return {"Files Processing": processing_files}
 
 @app.post("/extractor")
 def add_file(file: UploadFile):
