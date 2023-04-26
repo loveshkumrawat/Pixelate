@@ -10,7 +10,7 @@ from text_extractor.service import text_extract_from_file
 from metadata_extractor.service import extract_metadata
 
 
-app = faust.App("FaustApp", broker=f"kafka://{env.KAFKA_HOST}:{env.KAFKA_PORT}")
+app = faust.App("FaustApp", broker=[f"kafka://{env.KAFKA_HOST}:{env.KAFKA_PORT}", "kafka://localhost:39092"])
 
 # Topics creation
 create_topics(
@@ -21,7 +21,7 @@ create_topics(
 		"mark_complete_T"
 	],
 	num_partitions=4,
-	replication_factor=1
+	replication_factor=2
 )
 
 page_splitter_T: TopicT = app.topic('page_splitter_T')
