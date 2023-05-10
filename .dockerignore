@@ -1,0 +1,14 @@
+/.idea/
+/.vscode/
+/__pycache__/
+/files/
+/temp/
+/log_file.log
+/services/
+/frontend/
+/templates/
+/venv/
+/.logstore
+/Vol-PF-Minio/
+/Vol-PF-Mongo/
+/Vol-PF-postgres/

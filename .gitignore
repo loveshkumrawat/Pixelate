@@ -1,0 +1,17 @@
+**/.idea/
+**/.vscode/
+**/__pycache__/
+**/files/
+**/temp/
+**/.logrecord
+**/log_file.log
+**/services/
+**/frontend/
+**/templates/
+**/venv/
+**/.logstore
+**/Vol-PF-Minio/
+**/Vol-PF-Mongo/
+**/Vol-PF-postgres/
+**/pages0.jpg
+**/temp.py
